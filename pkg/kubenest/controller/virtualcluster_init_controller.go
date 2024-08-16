@@ -680,7 +680,7 @@ func (c *VirtualClusterInitController) AllocateHostPort(virtualCluster *v1alpha1
 	}
 
 	if virtualCluster.Spec.ExternalPort != 0 && !isPortInPool(virtualCluster.Spec.ExternalPort) {
-		return 0, err
+		return 0, fmt.Errorf("ExternalPort is not in host pool")
 	}
 
 	// 准备端口分配列表
@@ -688,6 +688,8 @@ func (c *VirtualClusterInitController) AllocateHostPort(virtualCluster *v1alpha1
 		ports := make([]int32, 0)
 		if virtualCluster.Spec.ExternalPort != 0 && !c.isPortAllocated(virtualCluster.Spec.ExternalPort) {
 			ports = append(ports, virtualCluster.Spec.ExternalPort)
+		} else if c.isPortAllocated(virtualCluster.Spec.ExternalPort) {
+			return nil
 		}
 		for _, p := range hostPool.PortsPool {
 			if !c.isPortAllocated(p) {
@@ -696,10 +698,14 @@ func (c *VirtualClusterInitController) AllocateHostPort(virtualCluster *v1alpha1
 		}
 		return ports
 	}()
+	if ports == nil {
+		return 0, fmt.Errorf("port", virtualCluster.Spec.ExternalPort, "is already being used")
+	}
 	//可分配端口不够
 	if len(ports) < constants.VirtualClusterPortNum {
 		return 0, fmt.Errorf("no available ports to allocate")
 	}
+
 	// 分配端口并更新 PortMap
 	virtualCluster.Status.PortMap = make(map[string]int32)
 	virtualCluster.Status.PortMap[constants.ApiServerPortKey] = ports[0]

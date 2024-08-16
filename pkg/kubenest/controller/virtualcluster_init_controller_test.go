@@ -35,7 +35,7 @@ func AllocateHostPortTemplate(virtualCluster *v1alpha1.VirtualCluster, usedPorts
 	// 获取主机端口池
 
 	isPortInPool := func(port1 int32) bool {
-		for p := range hostPoolPorts {
+		for _, p := range hostPoolPorts {
 			if int32(p) == port1 {
 				return true
 			}
@@ -46,7 +46,7 @@ func AllocateHostPortTemplate(virtualCluster *v1alpha1.VirtualCluster, usedPorts
 	// 准备端口分配列表
 
 	//判断ExternalPort是否在主机端口池里面
-	if virtualCluster.Spec.ExternalPort != 0 && isPortInPool(virtualCluster.Spec.ExternalPort) {
+	if virtualCluster.Spec.ExternalPort != 0 && !isPortInPool(virtualCluster.Spec.ExternalPort) {
 		return nil, nil
 	}
 
@@ -54,6 +54,8 @@ func AllocateHostPortTemplate(virtualCluster *v1alpha1.VirtualCluster, usedPorts
 		ports := make([]int32, 0)
 		if virtualCluster.Spec.ExternalPort != 0 && !isPortAllocated(virtualCluster.Spec.ExternalPort, usedPorts) {
 			ports = append(ports, virtualCluster.Spec.ExternalPort)
+		} else if isPortAllocated(virtualCluster.Spec.ExternalPort, usedPorts) {
+			return nil
 		}
 		for _, p := range hostPoolPorts {
 			if !isPortAllocated(p, usedPorts) {
@@ -62,6 +64,10 @@ func AllocateHostPortTemplate(virtualCluster *v1alpha1.VirtualCluster, usedPorts
 		}
 		return ports
 	}()
+
+	if ports == nil {
+		return nil, fmt.Errorf("port", virtualCluster.Spec.ExternalPort, "is already being used")
+	}
 	//可分配端口不够
 	if len(ports) < constants.VirtualClusterPortNum {
 		return nil, fmt.Errorf("no available ports to allocate")
@@ -126,6 +132,33 @@ func TestVirtualClusterInitController_AllocateHostPort(t *testing.T) {
 				usedPorts: map[string]int32{"vc1": 33006, "vc2": 33002, "vc3": 33003},
 			},
 			want: map[string]int32{"apiserver-port": 33001, "apiserver-network-proxy-agent-port": 33004, "apiserver-network-proxy-server-port": 33005, "apiserver-network-proxy-health-port": 33007, "apiserver-network-proxy-admin-port": 33008},
+		},
+		{
+			name: "test3 - Not enough ports available",
+			args: args{
+				externalPort: 33001,
+				ports:        []int32{33001, 33002, 33003, 33004},
+				usedPorts:    map[string]int32{"vc1": 33001},
+			},
+			want: nil,
+		},
+		{
+			name: "test4 - Ports already allocated",
+			args: args{
+				externalPort: 33000,
+				ports:        []int32{33001, 33002, 33003, 33004, 33005, 33006, 33007},
+				usedPorts:    map[string]int32{},
+			},
+			want: nil,
+		},
+		{
+			name: "test5 ",
+			args: args{
+				externalPort: 33001,
+				ports:        []int32{33001, 33002, 33003, 33004, 33005, 33006, 33007},
+				usedPorts:    map[string]int32{"vc1": 33001},
+			},
+			want: nil,
 		},
 	}
 	for _, tt := range tests {
