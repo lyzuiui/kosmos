@@ -3367,6 +3367,13 @@ func schema_pkg_apis_kosmos_v1alpha1_VirtualClusterSpec(ref common.ReferenceCall
 							Format:      "",
 						},
 					},
+					"externalPort": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ExternalPort is the port number for the external IP of the virtual kubernetes's control plane",
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
 					"promotePolicies": {
 						SchemaProps: spec.SchemaProps{
 							Description: "PromotePolicies definites the policies for promote to the kubernetes's control plane",
