@@ -66,13 +66,13 @@ func AllocateHostPortTemplate(virtualCluster *v1alpha1.VirtualCluster, usedPorts
 	}()
 
 	if ports == nil {
-		return nil, fmt.Errorf("port", virtualCluster.Spec.ExternalPort, "is already being used")
+		return nil, fmt.Errorf("port is already being used")
 	}
 	//可分配端口不够
 	if len(ports) < constants.VirtualClusterPortNum {
 		return nil, fmt.Errorf("no available ports to allocate")
 	}
-	// 分配端口并更新 PortMap
+	// 分配端口并s更新 PortMap
 	virtualCluster.Status.PortMap = make(map[string]int32)
 	virtualCluster.Status.PortMap[constants.ApiServerPortKey] = ports[0]
 	virtualCluster.Status.PortMap[constants.ApiServerNetworkProxyAgentPortKey] = ports[1]
@@ -159,6 +159,14 @@ func TestVirtualClusterInitController_AllocateHostPort(t *testing.T) {
 				usedPorts:    map[string]int32{"vc1": 33001},
 			},
 			want: nil,
+		},
+		{
+			name: "test6",
+			args: args{
+				ports:     []int32{33001, 33002, 33003, 33004, 33005, 33006, 33007},
+				usedPorts: map[string]int32{},
+			},
+			want: map[string]int32{"apiserver-port": 33001, "apiserver-network-proxy-agent-port": 33002, "apiserver-network-proxy-server-port": 33003, "apiserver-network-proxy-health-port": 33004, "apiserver-network-proxy-admin-port": 33005},
 		},
 	}
 	for _, tt := range tests {
