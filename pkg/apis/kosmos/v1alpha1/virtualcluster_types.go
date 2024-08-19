@@ -53,6 +53,10 @@ type VirtualClusterSpec struct {
 	// +optional
 	ExternalIP string `json:"externalIP,omitempty"`
 
+	// ExternalPort is the port number for the external IP of the virtual kubernetes's control plane
+	// +optional
+	ExternalPort int32 `json:"externalPort,omitempty"`
+
 	// ExternalIps is the external ips of the virtual kubernetes's control plane
 	// +optional
 	ExternalIps []string `json:"externalIps,omitempty"`
