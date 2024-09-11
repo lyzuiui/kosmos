@@ -12,7 +12,12 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/klog/v2"
+	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller"
+	"sigs.k8s.io/controller-runtime/pkg/event"
+	"sigs.k8s.io/controller-runtime/pkg/manager"
+	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
@@ -22,8 +27,7 @@ const (
 
 type PodGroupReconciler struct {
 	client.Client
-	RootClient client.Client
-
+	RootClient         client.Client
 	envResourceManager utils.EnvResourceManager
 
 	GlobalLeafManager       leafUtils.LeafResourceManager
@@ -124,6 +128,44 @@ func (r *PodGroupReconciler) leafClientResource(lr *leafUtils.LeafResource) (*le
 	return lcr, nil
 }
 
+// SetupWithManager registers the controller with the manager and sets up the event filtering
+func (r *PodGroupReconciler) SetupWithManager(mgr manager.Manager) error {
+	// 定义一个函数用于过滤 PodGroup 事件
+	skipFunc := func(obj client.Object) bool {
+		pg := obj.(*v1alpha1.PodGroup)
+
+		// 示例过滤逻辑：
+		// 1. 忽略名字以 "skip-" 开头的 PodGroup
+		if len(pg.Name) > 5 && pg.Name[:5] == "skip-" {
+			return false
+		}
+
+		// 2. 根据具体需求添加过滤逻辑，例如根据 PodGroup 的标签或注解
+		// 可以根据 PodGroup 的 spec、metadata 等进行复杂的过滤
+		return true
+	}
+
+	return ctrl.NewControllerManagedBy(mgr).
+		Named(PodGroupControllerName).     // 设置控制器名称
+		For(&v1alpha1.PodGroup{}).         // 监听 PodGroup 资源
+		WithOptions(controller.Options{}). // 可选项
+		WithEventFilter(predicate.Funcs{   // 定义事件过滤逻辑
+			CreateFunc: func(createEvent event.CreateEvent) bool {
+				return skipFunc(createEvent.Object)
+			},
+			UpdateFunc: func(updateEvent event.UpdateEvent) bool {
+				return skipFunc(updateEvent.ObjectNew)
+			},
+			DeleteFunc: func(deleteEvent event.DeleteEvent) bool {
+				return skipFunc(deleteEvent.Object)
+			},
+			GenericFunc: func(genericEvent event.GenericEvent) bool {
+				// 根据需要处理 Generic 事件
+				return false
+			},
+		}).
+		Complete(r)
+}
 func (r *PodGroupReconciler) CreatePodInLeafCluster(ctx context.Context, lr *leafUtils.LeafResource, podgroup *v1alpha1.PodGroup) error {
 
 	newPodGroup := &v1alpha1.PodGroup{
