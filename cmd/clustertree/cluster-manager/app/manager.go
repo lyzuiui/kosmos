@@ -22,6 +22,7 @@ import (
 	"github.com/kosmos.io/kosmos/pkg/clustertree/cluster-manager/controllers"
 	"github.com/kosmos.io/kosmos/pkg/clustertree/cluster-manager/controllers/mcs"
 	podcontrollers "github.com/kosmos.io/kosmos/pkg/clustertree/cluster-manager/controllers/pod"
+	podgroupcontrollers "github.com/kosmos.io/kosmos/pkg/clustertree/cluster-manager/controllers/podgroup"
 	"github.com/kosmos.io/kosmos/pkg/clustertree/cluster-manager/controllers/pv"
 	"github.com/kosmos.io/kosmos/pkg/clustertree/cluster-manager/controllers/pvc"
 	"github.com/kosmos.io/kosmos/pkg/clustertree/cluster-manager/controllers/svc"
@@ -270,6 +271,14 @@ func run(ctx context.Context, opts *options.Options) error {
 		if err := onewayPVCController.SetupWithManager(mgr); err != nil {
 			return fmt.Errorf("error starting oneway pvc controller %v", err)
 		}
+	}
+
+	//init podgroupController
+	pgController := podgroupcontrollers.PodGroupReconciler{
+		LeafClient: mgr.GetClient(),
+	}
+	if err := pgController.SetupWithManager(mgr); err != nil {
+		return fmt.Errorf("error starting pgController %s: %v", podgroupcontrollers.PodGroupControllerName, err)
 	}
 
 	// init commonController

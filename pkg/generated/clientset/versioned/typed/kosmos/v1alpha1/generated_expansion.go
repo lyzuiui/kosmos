@@ -20,6 +20,10 @@ type NodeConfigExpansion interface{}
 
 type PodConvertPolicyExpansion interface{}
 
+type PodGroupExpansion interface{}
+
+type QueueExpansion interface{}
+
 type ShadowDaemonSetExpansion interface{}
 
 type VirtualClusterExpansion interface{}

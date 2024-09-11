@@ -50,6 +50,18 @@ type PodConvertPolicyListerExpansion interface{}
 // PodConvertPolicyNamespaceLister.
 type PodConvertPolicyNamespaceListerExpansion interface{}
 
+// PodGroupListerExpansion allows custom methods to be added to
+// PodGroupLister.
+type PodGroupListerExpansion interface{}
+
+// PodGroupNamespaceListerExpansion allows custom methods to be added to
+// PodGroupNamespaceLister.
+type PodGroupNamespaceListerExpansion interface{}
+
+// QueueListerExpansion allows custom methods to be added to
+// QueueLister.
+type QueueListerExpansion interface{}
+
 // ShadowDaemonSetListerExpansion allows custom methods to be added to
 // ShadowDaemonSetLister.
 type ShadowDaemonSetListerExpansion interface{}

@@ -48,6 +48,14 @@ func (c *FakeKosmosV1alpha1) PodConvertPolicies(namespace string) v1alpha1.PodCo
 	return &FakePodConvertPolicies{c, namespace}
 }
 
+func (c *FakeKosmosV1alpha1) PodGroups(namespace string) v1alpha1.PodGroupInterface {
+	return &FakePodGroups{c, namespace}
+}
+
+func (c *FakeKosmosV1alpha1) Queues() v1alpha1.QueueInterface {
+	return &FakeQueues{c}
+}
+
 func (c *FakeKosmosV1alpha1) ShadowDaemonSets(namespace string) v1alpha1.ShadowDaemonSetInterface {
 	return &FakeShadowDaemonSets{c, namespace}
 }

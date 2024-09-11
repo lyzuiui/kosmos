@@ -26,6 +26,10 @@ type Interface interface {
 	NodeConfigs() NodeConfigInformer
 	// PodConvertPolicies returns a PodConvertPolicyInformer.
 	PodConvertPolicies() PodConvertPolicyInformer
+	// PodGroups returns a PodGroupInformer.
+	PodGroups() PodGroupInformer
+	// Queues returns a QueueInformer.
+	Queues() QueueInformer
 	// ShadowDaemonSets returns a ShadowDaemonSetInformer.
 	ShadowDaemonSets() ShadowDaemonSetInformer
 	// VirtualClusters returns a VirtualClusterInformer.
@@ -88,6 +92,16 @@ func (v *version) NodeConfigs() NodeConfigInformer {
 // PodConvertPolicies returns a PodConvertPolicyInformer.
 func (v *version) PodConvertPolicies() PodConvertPolicyInformer {
 	return &podConvertPolicyInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// PodGroups returns a PodGroupInformer.
+func (v *version) PodGroups() PodGroupInformer {
+	return &podGroupInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// Queues returns a QueueInformer.
+func (v *version) Queues() QueueInformer {
+	return &queueInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }
 
 // ShadowDaemonSets returns a ShadowDaemonSetInformer.

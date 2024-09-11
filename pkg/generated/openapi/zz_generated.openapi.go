@@ -75,10 +75,19 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/kosmos.io/kosmos/pkg/apis/kosmos/v1alpha1.PodConvertPolicy":                   schema_pkg_apis_kosmos_v1alpha1_PodConvertPolicy(ref),
 		"github.com/kosmos.io/kosmos/pkg/apis/kosmos/v1alpha1.PodConvertPolicyList":               schema_pkg_apis_kosmos_v1alpha1_PodConvertPolicyList(ref),
 		"github.com/kosmos.io/kosmos/pkg/apis/kosmos/v1alpha1.PodConvertPolicySpec":               schema_pkg_apis_kosmos_v1alpha1_PodConvertPolicySpec(ref),
+		"github.com/kosmos.io/kosmos/pkg/apis/kosmos/v1alpha1.PodGroup":                           schema_pkg_apis_kosmos_v1alpha1_PodGroup(ref),
+		"github.com/kosmos.io/kosmos/pkg/apis/kosmos/v1alpha1.PodGroupCondition":                  schema_pkg_apis_kosmos_v1alpha1_PodGroupCondition(ref),
+		"github.com/kosmos.io/kosmos/pkg/apis/kosmos/v1alpha1.PodGroupLister":                     schema_pkg_apis_kosmos_v1alpha1_PodGroupLister(ref),
+		"github.com/kosmos.io/kosmos/pkg/apis/kosmos/v1alpha1.PodGroupSpec":                       schema_pkg_apis_kosmos_v1alpha1_PodGroupSpec(ref),
+		"github.com/kosmos.io/kosmos/pkg/apis/kosmos/v1alpha1.PodGroupStatus":                     schema_pkg_apis_kosmos_v1alpha1_PodGroupStatus(ref),
 		"github.com/kosmos.io/kosmos/pkg/apis/kosmos/v1alpha1.PolicyTerm":                         schema_pkg_apis_kosmos_v1alpha1_PolicyTerm(ref),
 		"github.com/kosmos.io/kosmos/pkg/apis/kosmos/v1alpha1.PromotePolicy":                      schema_pkg_apis_kosmos_v1alpha1_PromotePolicy(ref),
 		"github.com/kosmos.io/kosmos/pkg/apis/kosmos/v1alpha1.PromoteResources":                   schema_pkg_apis_kosmos_v1alpha1_PromoteResources(ref),
 		"github.com/kosmos.io/kosmos/pkg/apis/kosmos/v1alpha1.Proxy":                              schema_pkg_apis_kosmos_v1alpha1_Proxy(ref),
+		"github.com/kosmos.io/kosmos/pkg/apis/kosmos/v1alpha1.Queue":                              schema_pkg_apis_kosmos_v1alpha1_Queue(ref),
+		"github.com/kosmos.io/kosmos/pkg/apis/kosmos/v1alpha1.QueueLister":                        schema_pkg_apis_kosmos_v1alpha1_QueueLister(ref),
+		"github.com/kosmos.io/kosmos/pkg/apis/kosmos/v1alpha1.QueueSpec":                          schema_pkg_apis_kosmos_v1alpha1_QueueSpec(ref),
+		"github.com/kosmos.io/kosmos/pkg/apis/kosmos/v1alpha1.QueueStatus":                        schema_pkg_apis_kosmos_v1alpha1_QueueStatus(ref),
 		"github.com/kosmos.io/kosmos/pkg/apis/kosmos/v1alpha1.ResourceSelector":                   schema_pkg_apis_kosmos_v1alpha1_ResourceSelector(ref),
 		"github.com/kosmos.io/kosmos/pkg/apis/kosmos/v1alpha1.Route":                              schema_pkg_apis_kosmos_v1alpha1_Route(ref),
 		"github.com/kosmos.io/kosmos/pkg/apis/kosmos/v1alpha1.SchedulerNameConverter":             schema_pkg_apis_kosmos_v1alpha1_SchedulerNameConverter(ref),
@@ -2708,6 +2717,272 @@ func schema_pkg_apis_kosmos_v1alpha1_PodConvertPolicySpec(ref common.ReferenceCa
 	}
 }
 
+func schema_pkg_apis_kosmos_v1alpha1_PodGroup(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "PodGroup is a collection of Pod; used for batch workload.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"TypeMeta": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.TypeMeta"),
+						},
+					},
+					"ObjectMeta": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+						},
+					},
+					"Spec": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Specification of the desired behavior of the pod group. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status",
+							Default:     map[string]interface{}{},
+							Ref:         ref("github.com/kosmos.io/kosmos/pkg/apis/kosmos/v1alpha1.PodGroupSpec"),
+						},
+					},
+					"Status": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Status represents the current information about a pod group. This data may not be up to date.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("github.com/kosmos.io/kosmos/pkg/apis/kosmos/v1alpha1.PodGroupStatus"),
+						},
+					},
+				},
+				Required: []string{"TypeMeta"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/kosmos.io/kosmos/pkg/apis/kosmos/v1alpha1.PodGroupSpec", "github.com/kosmos.io/kosmos/pkg/apis/kosmos/v1alpha1.PodGroupStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta", "k8s.io/apimachinery/pkg/apis/meta/v1.TypeMeta"},
+	}
+}
+
+func schema_pkg_apis_kosmos_v1alpha1_PodGroupCondition(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "PodGroupCondition contains details for the current state of this pod group.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"Type": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Type is the type of the condition",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"Status": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Status is the status of the condition.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"TransitionID": {
+						SchemaProps: spec.SchemaProps{
+							Description: "The ID of condition transition.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"LastTransitionTime": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Last time the phase transitioned from another to current phase.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
+						},
+					},
+					"Reason": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Unique, one-word, CamelCase reason for the phase's last transition.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"Message": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Human-readable message indicating details about last transition.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"Type", "Status", "TransitionID"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
+	}
+}
+
+func schema_pkg_apis_kosmos_v1alpha1_PodGroupLister(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "PodGroupList is a collection of pod groups.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"TypeMeta": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.TypeMeta"),
+						},
+					},
+					"ListMeta": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Standard list metadata More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+						},
+					},
+					"Items": {
+						SchemaProps: spec.SchemaProps{
+							Description: "items is the list of PodGroup",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/kosmos.io/kosmos/pkg/apis/kosmos/v1alpha1.PodGroup"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"TypeMeta", "Items"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/kosmos.io/kosmos/pkg/apis/kosmos/v1alpha1.PodGroup", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta", "k8s.io/apimachinery/pkg/apis/meta/v1.TypeMeta"},
+	}
+}
+
+func schema_pkg_apis_kosmos_v1alpha1_PodGroupSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "PodGroupSpec represents the template of a pod group.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"MinMember": {
+						SchemaProps: spec.SchemaProps{
+							Description: "MinMember defines the minimal number of members/tasks to run the pod group; if there's not enough resources to start all tasks, the scheduler will not start anyone.",
+							Default:     0,
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
+					"Queue": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Queue defines the queue to allocate resource for PodGroup; if queue does not exist, the PodGroup will not be scheduled.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"PriorityClassName": {
+						SchemaProps: spec.SchemaProps{
+							Description: "If specified, indicates the PodGroup's priority. \"system-node-critical\" and \"system-cluster-critical\" are two special keywords which indicate the highest priorities with the former being the highest priority. Any other name must be defined by creating a PriorityClass object with that name. If not specified, the PodGroup priority will be default or zero if there is no default.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"MinResources": {
+						SchemaProps: spec.SchemaProps{
+							Description: "MinResources defines the minimal resource of members/tasks to run the pod group; if there's not enough resources to start all tasks, the scheduler will not start anyone.",
+							Type:        []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Allows: true,
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("k8s.io/apimachinery/pkg/api/resource.Quantity"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"MinMember", "Queue", "MinResources"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/api/resource.Quantity"},
+	}
+}
+
+func schema_pkg_apis_kosmos_v1alpha1_PodGroupStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "PodGroupStatus represents the current state of a pod group.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"Phase": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Current phase of PodGroup.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"Conditions": {
+						SchemaProps: spec.SchemaProps{
+							Description: "The conditions of PodGroup.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/kosmos.io/kosmos/pkg/apis/kosmos/v1alpha1.PodGroupCondition"),
+									},
+								},
+							},
+						},
+					},
+					"Running": {
+						SchemaProps: spec.SchemaProps{
+							Description: "The number of actively running pods.",
+							Default:     0,
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
+					"Succeeded": {
+						SchemaProps: spec.SchemaProps{
+							Description: "The number of pods which reached phase Succeeded.",
+							Default:     0,
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
+					"Failed": {
+						SchemaProps: spec.SchemaProps{
+							Description: "The number of pods which reached phase Failed.",
+							Default:     0,
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
+				},
+				Required: []string{"Phase"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/kosmos.io/kosmos/pkg/apis/kosmos/v1alpha1.PodGroupCondition"},
+	}
+}
+
 func schema_pkg_apis_kosmos_v1alpha1_PolicyTerm(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -2834,6 +3109,198 @@ func schema_pkg_apis_kosmos_v1alpha1_Proxy(ref common.ReferenceCallback) common.
 		},
 		Dependencies: []string{
 			"k8s.io/apimachinery/pkg/apis/meta/v1.TypeMeta"},
+	}
+}
+
+func schema_pkg_apis_kosmos_v1alpha1_Queue(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "Queue is a queue of PodGroup.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"TypeMeta": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.TypeMeta"),
+						},
+					},
+					"ObjectMeta": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+						},
+					},
+					"Spec": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Specification of the desired behavior of the queue. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status",
+							Default:     map[string]interface{}{},
+							Ref:         ref("github.com/kosmos.io/kosmos/pkg/apis/kosmos/v1alpha1.QueueSpec"),
+						},
+					},
+					"Status": {
+						SchemaProps: spec.SchemaProps{
+							Description: "The status of queue.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("github.com/kosmos.io/kosmos/pkg/apis/kosmos/v1alpha1.QueueStatus"),
+						},
+					},
+				},
+				Required: []string{"TypeMeta"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/kosmos.io/kosmos/pkg/apis/kosmos/v1alpha1.QueueSpec", "github.com/kosmos.io/kosmos/pkg/apis/kosmos/v1alpha1.QueueStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta", "k8s.io/apimachinery/pkg/apis/meta/v1.TypeMeta"},
+	}
+}
+
+func schema_pkg_apis_kosmos_v1alpha1_QueueLister(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "QueueList is a collection of queues.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"TypeMeta": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.TypeMeta"),
+						},
+					},
+					"ListMeta": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Standard list metadata More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+						},
+					},
+					"Items": {
+						SchemaProps: spec.SchemaProps{
+							Description: "items is the list of PodGroup",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/kosmos.io/kosmos/pkg/apis/kosmos/v1alpha1.Queue"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"TypeMeta", "Items"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/kosmos.io/kosmos/pkg/apis/kosmos/v1alpha1.Queue", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta", "k8s.io/apimachinery/pkg/apis/meta/v1.TypeMeta"},
+	}
+}
+
+func schema_pkg_apis_kosmos_v1alpha1_QueueSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "QueueSpec represents the template of Queue.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"Weight": {
+						SchemaProps: spec.SchemaProps{
+							Default: 0,
+							Type:    []string{"integer"},
+							Format:  "int32",
+						},
+					},
+					"Capability": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Allows: true,
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("k8s.io/apimachinery/pkg/api/resource.Quantity"),
+									},
+								},
+							},
+						},
+					},
+					"State": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Depreicated: replaced by status.State",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"Reclaimable": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Reclaimable indicate whether the queue can be reclaimed by other queue",
+							Type:        []string{"boolean"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"Weight", "Capability", "State", "Reclaimable"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/api/resource.Quantity"},
+	}
+}
+
+func schema_pkg_apis_kosmos_v1alpha1_QueueStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "QueueStatus represents the status of Queue.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"State": {
+						SchemaProps: spec.SchemaProps{
+							Description: "State is status of queue",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"Unknown": {
+						SchemaProps: spec.SchemaProps{
+							Description: "The number of 'Unknown' PodGroup in this queue.",
+							Default:     0,
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
+					"Pending": {
+						SchemaProps: spec.SchemaProps{
+							Description: "The number of 'Pending' PodGroup in this queue.",
+							Default:     0,
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
+					"Running": {
+						SchemaProps: spec.SchemaProps{
+							Description: "The number of 'Running' PodGroup in this queue.",
+							Default:     0,
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
+					"Inqueue": {
+						SchemaProps: spec.SchemaProps{
+							Description: "The number of `Inqueue` PodGroup in this queue.",
+							Default:     0,
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
+				},
+				Required: []string{"State", "Unknown", "Pending", "Running", "Inqueue"},
+			},
+		},
 	}
 }
 
