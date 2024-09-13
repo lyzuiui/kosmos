@@ -22,6 +22,8 @@ import (
 	"github.com/kosmos.io/kosmos/pkg/clustertree/cluster-manager/controllers"
 	"github.com/kosmos.io/kosmos/pkg/clustertree/cluster-manager/controllers/mcs"
 	podcontrollers "github.com/kosmos.io/kosmos/pkg/clustertree/cluster-manager/controllers/pod"
+
+	podgroupcontrollers "github.com/kosmos.io/kosmos/pkg/clustertree/cluster-manager/controllers/podgroup"
 	"github.com/kosmos.io/kosmos/pkg/clustertree/cluster-manager/controllers/pv"
 	"github.com/kosmos.io/kosmos/pkg/clustertree/cluster-manager/controllers/pvc"
 	"github.com/kosmos.io/kosmos/pkg/clustertree/cluster-manager/controllers/svc"
@@ -230,6 +232,17 @@ func run(ctx context.Context, opts *options.Options) error {
 	}
 	if err := rootPodReconciler.SetupWithManager(mgr); err != nil {
 		return fmt.Errorf("error starting rootPodReconciler %s: %v", podcontrollers.RootPodControllerName, err)
+	}
+
+	podgroupReconciler := podgroupcontrollers.PodGroupReconciler{
+		RootClient:              mgr.GetClient(), // 使用 manager 提供的客户端
+		GlobalLeafClientManager: globalLeafClientManager,
+		GlobalLeafManager:       globalLeafResourceManager,
+		DynamicRootClient:       dynamicClient,
+		Options:                 opts,
+	}
+	if err := podgroupReconciler.SetupWithManager(mgr); err != nil {
+		return fmt.Errorf("error starting PodGroupReconciler %s: %v", podgroupcontrollers.PodGroupControllerName, err)
 	}
 
 	rootPVCController := pvc.RootPVCController{
