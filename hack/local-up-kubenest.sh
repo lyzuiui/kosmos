@@ -185,13 +185,12 @@ if [[ -z "${HOST_IPADDRESS}" ]]; then
   util::get_macos_ipaddress # Adapt for macOS
   HOST_IPADDRESS=${MAC_NIC_IPADDRESS:-}
 fi
+prepare_vc_image && prepare_docker_image
+load_kubenetst_cluster_images $HOST_CLUSTER_NAME  && load_openebs_images $HOST_CLUSTER_NAME && load_vc_images $HOST_CLUSTER_NAME
 create_cluster "${KIND_IMAGE}" "$HOST_IPADDRESS" $HOST_CLUSTER_NAME $HOST_CLUSTER_POD_CIDR $HOST_CLUSTER_SERVICE_CIDR false true true
-
 dockerip=$(docker inspect "${HOST_CLUSTER_NAME}-control-plane" --format "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}")
 host_config_base64=$(cat ${CLUSTER_DIR}/kubeconfig-nodeIp | base64  -w0)
 
-prepare_vc_image
-load_kubenetst_cluster_images $HOST_CLUSTER_NAME  && load_openebs_images $HOST_CLUSTER_NAME && load_vc_images $HOST_CLUSTER_NAME
 hostConfig_path="${ROOT}/environments/${HOST_CLUSTER_NAME}/kubeconfig-nodeIp"
 kubectl --kubeconfig $hostConfig_path apply -f ${REPO_ROOT}/hack/k8s-in-k8s/openebs-hostpath.yaml
 
