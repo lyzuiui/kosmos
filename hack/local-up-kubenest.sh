@@ -828,6 +828,7 @@ spec:
       initContainers:
         - name: init-agent
           image: ghcr.io/kosmos-io/node-agent:${VERSION}
+          imagePullPolicy: IfNotPresent
           securityContext:
             privileged: true
           env:
@@ -854,6 +855,7 @@ spec:
       containers:
         - name: install-agent
           image: ghcr.io/kosmos-io/node-agent:${VERSION}
+          imagePullPolicy: IfNotPresent
           securityContext:
             privileged: true # container privileged
           command:
