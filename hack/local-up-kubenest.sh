@@ -11,12 +11,17 @@ function usage() {
     echo "    HOST_IPADDRESS: (required) if you want to export clusters' API server port to specific IP address"
     echo "    h: print help information"
 }
-
+VERSION=${VERSION:-"v1.27.3-eki.1.0.0"}
 REPO_ROOT=$(dirname "${BASH_SOURCE[0]}")/..
 source "$(dirname "${BASH_SOURCE[0]}")/install_kind_kubectl.sh"
 source "$(dirname "${BASH_SOURCE[0]}")/cluster.sh"
 source "$(dirname "${BASH_SOURCE[0]}")/util.sh"
-
+KIND_IMAGE=${KIND_IMAGE:-"kindest/node:v1.27.3.1"}
+HOST_IPADDRESS=${1:-}
+HOST_CLUSTER_NAME="kubenest"
+HOST_CLUSTER_POD_CIDR="10.233.64.0/18"
+HOST_CLUSTER_SERVICE_CIDR="10.233.0.0/18"
+CLUSTER_DIR="${REPO_ROOT}/environments/${HOST_CLUSTER_NAME}"
 
 function build_kind_image() {
     local image_name=$1
@@ -82,8 +87,8 @@ function prepare_vc_image() {
         echo "找到最新的镜像: $image_name (ID: $image_id)"
 
         # 打上 latest 标签
-        docker tag "$image_id" "${image_name}:latest"
-        echo "已为镜像打上最新标签: ${image_name}:latest"
+        docker tag "$image_id" "${image_name}:${VERSION}"
+        echo "已为镜像打上最新标签: ${image_name}:${VERSION}"
     else
         echo "未找到 virtual-cluster-operator 的镜像"
     fi
@@ -101,8 +106,8 @@ function prepare_vc_image() {
         echo "找到最新的镜像: $image_name (ID: $image_id)"
 
         # 打上 latest 标签
-        docker tag "$image_id" "${image_name}:latest"
-        echo "已为镜像打上最新标签: ${image_name}:latest"
+        docker tag "$image_id" "${image_name}:${VERSION}"
+        echo "已为镜像打上最新标签: ${image_name}:${VERSION}"
     else
         echo "未找到 node-agent 的镜像"
     fi
@@ -125,31 +130,35 @@ function prepare_vc_image() {
     docker tag m.daocloud.io/gcr.io/k8s-staging-kas-network-proxy/proxy-agent:v20211105-konnectivity-clientv0.0.25-2-g9e52504 kubenest.io/kas-network-proxy-agent:"${VERSION}"
 
     # 其他eki镜像
-    # docker push hidevine/kube-apiserver:v1.25.7-eki.3.0.0
-    # docker push hidevine/hidevine/scheduler:v1.25.7-eki.3.0.0
-    # docker push hidevine/kube-proxy:v1.25.7-eki.3.0.0
-    # docker push hidevine/kube-controller-manager:v1.25.7-eki.3.0.0
-    # docker push hidevine/etcd:v1.25.7-eki.3.0.0
-    # docker push hidevine/keepalived:v1.25.7-eki.3.0.0
-    # docker push hidevine/kubectl:v1.25.7-eki.3.0.0
+    
+    docker pull crpi-rme8y4cjdec9z3ny.cn-shanghai.personal.cr.aliyuncs.com/nlk123/registry_p:22855
+    docker pull m.daocloud.io/registry.k8s.io/kube-scheduler:v1.27.3
+    docker pull m.daocloud.io/registry.k8s.io/kube-proxy:v1.27.3
+    docker pull m.daocloud.io/registry.k8s.io/kube-controller-manager:v1.27.3
+    docker pull m.daocloud.io/registry.k8s.io/etcd:3.5.7-0
+    docker pull m.daocloud.io/docker.io/osixia/keepalived:2.0.20
+    docker pull m.daocloud.io/docker.io/kubesphere/kubectl:v1.27.16
+    docker pull m.daocloud.io/registry.k8s.io/coredns/coredns:v1.9.3
+    docker pull crpi-rme8y4cjdec9z3ny.cn-shanghai.personal.cr.aliyuncs.com/nlk123/registry_p:calico_node_ecloud
+    docker pull m.daocloud.io/docker.io/calico/typha:v3.23.2
+    docker pull m.daocloud.io/docker.io/calico/cni:v3.23.2
+    docker pull m.daocloud.io/docker.io/calico/kube-controllers:v3.23.2
+    
 
-    docker pull hidevine/kube-apiserver:v1.25.7-eki.3.0.0
-    docker pull hidevine/scheduler:v1.25.7-eki.3.0.0
-    docker pull hidevine/kube-proxy:v1.25.7-eki.3.0.0
-    docker pull hidevine/kube-controller-manager:v1.25.7-eki.3.0.0
-    docker pull hidevine/etcd:v1.25.7-eki.3.0.0
-    docker pull hidevine/keepalived:v1.25.7-eki.3.0.0
-    docker pull hidevine/kubectl:v1.25.7-eki.3.0.0
-    
-    docker tag hidevine/kube-apiserver:v1.25.7-eki.3.0.0 kubenest.io/kube-apiserver:"${VERSION}"
-    docker tag hidevine/scheduler:v1.25.7-eki.3.0.0 kubenest.io/scheduler:"${VERSION}"
-    docker tag hidevine/kube-proxy:v1.25.7-eki.3.0.0 kubenest.io/kube-proxy:"${VERSION}"
-    docker tag hidevine/kube-controller-manager:v1.25.7-eki.3.0.0 kubenest.io/kube-controller-manager:"${VERSION}"
-    docker tag hidevine/etcd:v1.25.7-eki.3.0.0 kubenest.io/etcd:"${VERSION}"
-    docker tag hidevine/keepalived:v1.25.7-eki.3.0.0 kubenest.io/keepalived:"${VERSION}"
-    docker tag hidevine/kubectl:v1.25.7-eki.3.0.0 kubenest.io/kubectl:"${VERSION}"
-    
+    docker tag crpi-rme8y4cjdec9z3ny.cn-shanghai.personal.cr.aliyuncs.com/nlk123/registry_p:22855 kubenest.io/kube-apiserver:"${VERSION}"
+    docker tag m.daocloud.io/registry.k8s.io/kube-scheduler:v1.27.3 kubenest.io/scheduler:"${VERSION}"
+    docker tag m.daocloud.io/registry.k8s.io/kube-proxy:v1.27.3 kubenest.io/kube-proxy:"${VERSION}"
+    docker tag m.daocloud.io/registry.k8s.io/kube-controller-manager:v1.27.3 kubenest.io/kube-controller-manager:"${VERSION}"
+    docker tag m.daocloud.io/registry.k8s.io/etcd:3.5.7-0 kubenest.io/etcd:"${VERSION}"
+    docker tag m.daocloud.io/docker.io/osixia/keepalived:2.0.20 kubenest.io/keepalived:"${VERSION}"
+    docker tag m.daocloud.io/docker.io/kubesphere/kubectl:v1.27.16 kubenest.io/kubectl:"${VERSION}"
+    docker tag m.daocloud.io/registry.k8s.io/coredns/coredns:v1.9.3 kubenest.io/coredns:v1.9.3
+    docker tag crpi-rme8y4cjdec9z3ny.cn-shanghai.personal.cr.aliyuncs.com/nlk123/registry_p:calico_node_ecloud calico/calico_node_ecloud:v3.23.2
+    docker tag m.daocloud.io/docker.io/calico/typha:v3.23.2 calico/typha:v3.23.2
+    docker tag m.daocloud.io/docker.io/calico/cni:v3.23.2 calico/cni:v3.23.2
+    docker tag m.daocloud.io/docker.io/calico/kube-controllers:v3.23.2 calico/kube-controllers:v3.23.2
 }
+
 
 function load_openebs_images() {
     local -r clustername=$1
@@ -162,25 +171,24 @@ function load_openebs_images() {
 
 function load_vc_images() {
     local -r clustername=$1
-    kind load docker-image  kubenest.io/kube-apiserver:"${VERSION}"   --name "$clustername"
+    kind load docker-image  kubenest.io/kas-network-proxy-server:"${VERSION}"   --name "$clustername"
+    kind load docker-image  kubenest.io/kas-network-proxy-agent:"${VERSION}"   --name "$clustername"
     kind load docker-image  kubenest.io/scheduler:"${VERSION}"   --name "$clustername"
     kind load docker-image  kubenest.io/kube-proxy:"${VERSION}"   --name "$clustername"
     kind load docker-image  kubenest.io/kube-controller-manager:"${VERSION}"   --name "$clustername"
+    kind load docker-image  kubenest.io/kube-apiserver:"${VERSION}"  --name "$clustername"
     kind load docker-image  kubenest.io/etcd:"${VERSION}"   --name "$clustername"
     kind load docker-image  kubenest.io/keepalived:"${VERSION}"   --name "$clustername"
     kind load docker-image  kubenest.io/kubectl:"${VERSION}"   --name "$clustername"
+    kind load docker-image  kubenest.io/coredns:v1.9.3  --name "$clustername"
+    kind load docker-image  calico/typha:v3.23.2  --name "$clustername"
+    kind load docker-image  calico/cni:v3.23.2   --name "$clustername"
+    kind load docker-image  calico/kube-controllers:v3.23.2  --name "$clustername"
+    kind load docker-image  calico/calico_node_ecloud:v3.23.2  --name "$clustername"
 }
 
 
-build_kind_image "kindest/node:v1.27.3.1"
-KIND_IMAGE=${KIND_IMAGE:-"kindest/node:v1.27.3.1"}
-HOST_IPADDRESS=${1:-}
-HOST_CLUSTER_NAME="kubenest"
-HOST_CLUSTER_POD_CIDR="10.233.64.0/18"
-HOST_CLUSTER_SERVICE_CIDR="10.233.0.0/18"
-VERSION=${VERSION:-"latest"}
-CLUSTER_DIR="${REPO_ROOT}/environments/${HOST_CLUSTER_NAME}"
-
+build_kind_image "${KIND_IMAGE}"
 if [[ -z "${HOST_IPADDRESS}" ]]; then
   util::get_macos_ipaddress # Adapt for macOS
   HOST_IPADDRESS=${MAC_NIC_IPADDRESS:-}
@@ -188,10 +196,13 @@ fi
 prepare_vc_image && prepare_docker_image
 create_cluster "${KIND_IMAGE}" "$HOST_IPADDRESS" $HOST_CLUSTER_NAME $HOST_CLUSTER_POD_CIDR $HOST_CLUSTER_SERVICE_CIDR false true true
 load_kubenetst_cluster_images $HOST_CLUSTER_NAME  && load_openebs_images $HOST_CLUSTER_NAME && load_vc_images $HOST_CLUSTER_NAME
+#docker inspect "kubenest-control-plane" --format "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}"
 dockerip=$(docker inspect "${HOST_CLUSTER_NAME}-control-plane" --format "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}")
-host_config_base64=$(cat ${CLUSTER_DIR}/kubeconfig-nodeIp | base64  -w0)
+kind export kubeconfig --name "$HOST_CLUSTER_NAME"
+sed -i -e "s|127.0.0.1:[0-9]*|$dockerip:6443|g"  -e "/certificate-authority-data:/d"  -e "5s/^/    insecure-skip-tls-verify: true\n/"  ${CLUSTER_DIR}/kubeconfig
 
-hostConfig_path="${ROOT}/environments/${HOST_CLUSTER_NAME}/kubeconfig-nodeIp"
+host_config_base64=$(cat ${CLUSTER_DIR}/kubeconfig | base64  -w0)
+hostConfig_path="${ROOT}/environments/${HOST_CLUSTER_NAME}/kubeconfig"
 kubectl --kubeconfig $hostConfig_path apply -f ${REPO_ROOT}/hack/k8s-in-k8s/openebs-hostpath.yaml
 
 cat <<EOF >vc-operator.yaml
@@ -992,7 +1003,7 @@ echo "wait all kosmos pod ready"
 # N = nodeNum + 1
 N=$(kubectl --kubeconfig $hostConfig_path get pod -n kosmos-system --no-headers | wc -l)
 util::wait_for_condition "all pod are ready" \
-  "kubectl --kubeconfig $hostConfig_path get pod -n kosmos-system | awk 'NR>1 {if (\$4 != \"Running\") exit 1; }' && [ \$(kubectl --kubeconfig $hostConfig_path get pod -n kosmos-system --no-headers | wc -l) -eq ${N} ]" \
+  "kubectl --kubeconfig $hostConfig_path get pod -n kosmos-system | awk 'NR>1 {if (\$3 != \"Running\") exit 1; }' && [ \$(kubectl --kubeconfig $hostConfig_path get pod -n kosmos-system --no-headers | wc -l) -eq ${N} ]" \
   300
 echo "all pod ready"
 
@@ -1000,8 +1011,8 @@ kubectl --kubeconfig $hostConfig_path apply -f ${REPO_ROOT}/deploy/crds/kosmos.i
 kubectl --kubeconfig $hostConfig_path apply -f ${REPO_ROOT}/deploy/crds/kosmos.io_globalnodes.yaml
 
 export KUBECONFIG=$hostConfig_path
-bash bash ${REPO_ROOT}/hack/k8s-in-k8s/generate_globalnode.sh
-
+bash ${REPO_ROOT}/hack/generate_globalnode.sh
+kind export kubeconfig --name "$HOST_CLUSTER_NAME"
 
 
 
