@@ -10,7 +10,7 @@ nodes:
 - role: control-plane
   extraMounts:
     - hostPath: /root
-      containerPath: /apps
+      containerPath: /home/vc
     - hostPath: /run/udev
       containerPath: /run/udev
   kubeadmConfigPatches:
@@ -20,7 +20,7 @@ nodes:
 - role: worker
   extraMounts:
     - hostPath: /root
-      containerPath: /apps
+      containerPath: /home/vc
     - hostPath: /run/udev
       containerPath: /run/udev
   kubeadmConfigPatches:
@@ -30,7 +30,7 @@ nodes:
 - role: worker
   extraMounts:
     - hostPath: /root
-      containerPath: /apps
+      containerPath: /home/vc
     - hostPath: /run/udev
       containerPath: /run/udev
   kubeadmConfigPatches:
@@ -40,7 +40,7 @@ nodes:
 - role: worker
   extraMounts:
     - hostPath: /root
-      containerPath: /apps
+      containerPath: /home/vc
     - hostPath: /run/udev
       containerPath: /run/udev
   kubeadmConfigPatches:
@@ -50,7 +50,7 @@ nodes:
 - role: worker
   extraMounts:
     - hostPath: /root
-      containerPath: /apps
+      containerPath: /home/vc
     - hostPath: /run/udev
       containerPath: /run/udev
   kubeadmConfigPatches:

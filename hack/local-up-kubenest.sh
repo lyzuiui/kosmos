@@ -62,55 +62,55 @@ function prepare_vc_image() {
     # "openebs/linux-utils:3.3.0"
     # "openebs/node-disk-exporter:2.0.0"
     # "openebs/provisioner-localpv:3.3.0"
-    docker pull docker.m.daocloud.io/openebs/node-disk-manager:2.0.0
-    docker pull docker.m.daocloud.io/openebs/node-disk-operator:2.0.0
-    docker pull docker.m.daocloud.io/openebs/linux-utils:3.3.0
-    docker pull docker.m.daocloud.io/openebs/node-disk-exporter:2.0.0
-    docker pull docker.m.daocloud.io/openebs/provisioner-localpv:3.3.0
+    # docker pull docker.m.daocloud.io/openebs/node-disk-manager:2.0.0
+    # docker pull docker.m.daocloud.io/openebs/node-disk-operator:2.0.0
+    # docker pull docker.m.daocloud.io/openebs/linux-utils:3.3.0
+    # docker pull docker.m.daocloud.io/openebs/node-disk-exporter:2.0.0
+    # docker pull docker.m.daocloud.io/openebs/provisioner-localpv:3.3.0
 
-    docker tag docker.m.daocloud.io/openebs/node-disk-manager:2.0.0 openebs/node-disk-manager:2.0.0
-    docker tag docker.m.daocloud.io/openebs/node-disk-operator:2.0.0 openebs/node-disk-operator:2.0.0
-    docker tag docker.m.daocloud.io/openebs/linux-utils:3.3.0 openebs/linux-utils:3.3.0
-    docker tag docker.m.daocloud.io/openebs/node-disk-exporter:2.0.0 openebs/node-disk-exporter:2.0.0
-    docker tag docker.m.daocloud.io/openebs/provisioner-localpv:3.3.0 openebs/provisioner-localpv:3.3.0
+    # docker tag docker.m.daocloud.io/openebs/node-disk-manager:2.0.0 openebs/node-disk-manager:2.0.0
+    # docker tag docker.m.daocloud.io/openebs/node-disk-operator:2.0.0 openebs/node-disk-operator:2.0.0
+    # docker tag docker.m.daocloud.io/openebs/linux-utils:3.3.0 openebs/linux-utils:3.3.0
+    # docker tag docker.m.daocloud.io/openebs/node-disk-exporter:2.0.0 openebs/node-disk-exporter:2.0.0
+    # docker tag docker.m.daocloud.io/openebs/provisioner-localpv:3.3.0 openebs/provisioner-localpv:3.3.0
 
     # 生成githhub 仓库镜像
-    cd .. && make image-virtual-cluster-operator && cd hack
-    # 根据上一步生成的镜像ID镜像替换，并设置标签
-    latest_virtual_cluster_operator_image=$(docker images --format '{{.Repository}}  {{.ID}} {{.CreatedAt}}' | grep 'virtual-cluster-operator' | sort -k3,3 -r | head -n 1)
-    # 检查是否找到镜像
-    if [[ -n "${latest_virtual_cluster_operator_image}" ]]; then
-        # 获取镜像 ID 和名称
-        image_name=$(echo "${latest_virtual_cluster_operator_image}" | awk '{print $1}')
-        image_id=$(echo "${latest_virtual_cluster_operator_image}" | awk '{print $2}')
+    # cd .. && make image-virtual-cluster-operator && cd hack
+    # # 根据上一步生成的镜像ID镜像替换，并设置标签
+    # latest_virtual_cluster_operator_image=$(docker images --format '{{.Repository}}  {{.ID}} {{.CreatedAt}}' | grep 'virtual-cluster-operator' | sort -k3,3 -r | head -n 1)
+    # # 检查是否找到镜像
+    # if [[ -n "${latest_virtual_cluster_operator_image}" ]]; then
+    #     # 获取镜像 ID 和名称
+    #     image_name=$(echo "${latest_virtual_cluster_operator_image}" | awk '{print $1}')
+    #     image_id=$(echo "${latest_virtual_cluster_operator_image}" | awk '{print $2}')
 
-        echo "找到最新的镜像: $image_name (ID: $image_id)"
+    #     echo "找到最新的镜像: $image_name (ID: $image_id)"
 
-        # 打上 latest 标签
-        docker tag "$image_id" "${image_name}:${VERSION}"
-        echo "已为镜像打上最新标签: ${image_name}:${VERSION}"
-    else
-        echo "未找到 virtual-cluster-operator 的镜像"
-    fi
+    #     # 打上 latest 标签
+    #     docker tag "$image_id" "${image_name}:${VERSION}"
+    #     echo "已为镜像打上最新标签: ${image_name}:${VERSION}"
+    # else
+    #     echo "未找到 virtual-cluster-operator 的镜像"
+    # fi
     
-    cd .. && make image-node-agent && cd hack
-    # 根据上一生成的镜像标签进行替换
-    latest_node_agent_image=$(docker images --format '{{.Repository}} {{.ID}} {{.CreatedAt}}' | grep 'node-agent' | sort -k3,3 -r | head -n 1)
+    # cd .. && make image-node-agent && cd hack
+    # # 根据上一生成的镜像标签进行替换
+    # latest_node_agent_image=$(docker images --format '{{.Repository}} {{.ID}} {{.CreatedAt}}' | grep 'node-agent' | sort -k3,3 -r | head -n 1)
 
-    # 检查是否找到镜像
-    if [[ -n "${latest_node_agent_image}" ]]; then
-        # 获取镜像 ID 和名称
-        image_name=$(echo "${latest_node_agent_image}" | awk '{print $1}')
-        image_id=$(echo "${latest_node_agent_image}" | awk '{print $2}')
+    # # 检查是否找到镜像
+    # if [[ -n "${latest_node_agent_image}" ]]; then
+    #     # 获取镜像 ID 和名称
+    #     image_name=$(echo "${latest_node_agent_image}" | awk '{print $1}')
+    #     image_id=$(echo "${latest_node_agent_image}" | awk '{print $2}')
 
-        echo "找到最新的镜像: $image_name (ID: $image_id)"
+    #     echo "找到最新的镜像: $image_name (ID: $image_id)"
 
-        # 打上 latest 标签
-        docker tag "$image_id" "${image_name}:${VERSION}"
-        echo "已为镜像打上最新标签: ${image_name}:${VERSION}"
-    else
-        echo "未找到 node-agent 的镜像"
-    fi
+    #     # 打上 latest 标签
+    #     docker tag "$image_id" "${image_name}:${VERSION}"
+    #     echo "已为镜像打上最新标签: ${image_name}:${VERSION}"
+    # else
+    #     echo "未找到 node-agent 的镜像"
+    # fi
 
     
 
@@ -160,13 +160,10 @@ function prepare_vc_image() {
 }
 
 
-function load_openebs_images() {
+function load_node_agent_images() {
     local -r clustername=$1
-    kind load docker-image openebs/node-disk-manager:2.0.0 --name "$clustername"
-    kind load docker-image openebs/node-disk-operator:2.0.0 --name "$clustername"
-    kind load docker-image openebs/linux-utils:3.3.0 --name "$clustername"
-    kind load docker-image openebs/node-disk-exporter:2.0.0 --name "$clustername"
-    kind load docker-image openebs/provisioner-localpv:3.3.0 --name "$clustername"
+    kind load docker-image testsz25-50ac9c6c.ecis-suzhou-1.cmecloud.cn/kosmos/virtual-cluster-operator:v0.5.4 --name "$clustername"
+    kind load docker-image testsz25-50ac9c6c.ecis-suzhou-1.cmecloud.cn/kosmos/node-agent:Vtest1.0 --name "$clustername"
 }
 
 function load_vc_images() {
@@ -193,9 +190,9 @@ if [[ -z "${HOST_IPADDRESS}" ]]; then
   util::get_macos_ipaddress # Adapt for macOS
   HOST_IPADDRESS=${MAC_NIC_IPADDRESS:-}
 fi
-prepare_vc_image && prepare_docker_image
+#prepare_vc_image && prepare_docker_image
 create_cluster "${KIND_IMAGE}" "$HOST_IPADDRESS" $HOST_CLUSTER_NAME $HOST_CLUSTER_POD_CIDR $HOST_CLUSTER_SERVICE_CIDR false true true
-load_kubenetst_cluster_images $HOST_CLUSTER_NAME  && load_openebs_images $HOST_CLUSTER_NAME && load_vc_images $HOST_CLUSTER_NAME
+#load_kubenetst_cluster_images $HOST_CLUSTER_NAME  && load_openebs_images $HOST_CLUSTER_NAME && load_vc_images $HOST_CLUSTER_NAME
 #docker inspect "kubenest-control-plane" --format "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}"
 dockerip=$(docker inspect "${HOST_CLUSTER_NAME}-control-plane" --format "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}")
 kind export kubeconfig --name "$HOST_CLUSTER_NAME"
@@ -203,7 +200,11 @@ sed -i -e "s|127.0.0.1:[0-9]*|$dockerip:6443|g"  -e "/certificate-authority-data
 
 host_config_base64=$(cat ${CLUSTER_DIR}/kubeconfig | base64  -w0)
 hostConfig_path="${ROOT}/environments/${HOST_CLUSTER_NAME}/kubeconfig"
-kubectl --kubeconfig $hostConfig_path apply -f ${REPO_ROOT}/hack/k8s-in-k8s/openebs-hostpath.yaml
+kubectl --kubeconfig $hostConfig_path apply -f ${REPO_ROOT}/deploy/crds/kosmos.io_virtualclusters.yaml
+kubectl --kubeconfig $hostConfig_path apply -f ${REPO_ROOT}/deploy/crds/kosmos.io_globalnodes.yaml
+
+export KUBECONFIG=$hostConfig_path
+bash ${REPO_ROOT}/hack/generate_globalnode.sh
 
 cat <<EOF >vc-operator.yaml
 ---
@@ -762,15 +763,15 @@ spec:
                 topologyKey: kubernetes.io/hostname
       containers:
         - name: virtual-cluster-operator
-          image: ghcr.io/kosmos-io/virtual-cluster-operator:${VERSION}
+          image: testsz25-50ac9c6c.ecis-suzhou-1.cmecloud.cn/kosmos/virtual-cluster-operator:v0.5.4
           imagePullPolicy: IfNotPresent
           env:
             - name: WAIT_NODE_READ_TIME
               value: "120"
             - name: IMAGE_REPOSITIRY
-              value: kubenest.io
+              value: testsz25-50ac9c6c.ecis-suzhou-1.cmecloud.cn/kosmos
             - name: IMAGE_VERSION
-              value: ${VERSION}
+              value: v1.25.7-eki.3.0.0-beta
             - name: EXECTOR_HOST_MASTER_NODE_IP
               value: $dockerip
             - name: EXECTOR_SHELL_NAME
@@ -813,7 +814,7 @@ spec:
           configMap:
             name: virtual-cluster-operator
         - hostPath:
-            path: /apps/vc-operator/manifest
+            path: /home/vc/vc-operator/manifest
             type: DirectoryOrCreate
           name: components-manifest
 ---
@@ -838,8 +839,7 @@ spec:
         - operator: Exists # run on all nodes
       initContainers:
         - name: init-agent
-          image: ghcr.io/kosmos-io/node-agent:${VERSION}
-          imagePullPolicy: IfNotPresent
+          image: testsz25-50ac9c6c.ecis-suzhou-1.cmecloud.cn/kosmos/node-agent:V5.0
           securityContext:
             privileged: true
           env:
@@ -853,6 +853,11 @@ spec:
                 secretKeyRef:
                   name: node-agent-secret
                   key: password
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: spec.nodeName
           command: ["/bin/bash"]
           args:
             - "/app/init.sh"
@@ -863,10 +868,27 @@ spec:
             - mountPath: /host-systemd
               name: systemd-path
               readOnly: false
+            - mountPath: /app/kubeconfigpath
+              name: kubeconfig
+              subPath: kubeconfig  
+              readOnly: false
       containers:
         - name: install-agent
-          image: ghcr.io/kosmos-io/node-agent:${VERSION}
-          imagePullPolicy: IfNotPresent
+          image: testsz25-50ac9c6c.ecis-suzhou-1.cmecloud.cn/kosmos/node-agent:V5.0
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 5678
+              scheme: HTTPS
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 5678
+              scheme: HTTPS
+            initialDelaySeconds: 5
+            periodSeconds: 10          
           securityContext:
             privileged: true # container privileged
           command:
@@ -892,6 +914,10 @@ spec:
           hostPath:
             path: /etc/systemd/system
             type: DirectoryOrCreate
+        - name: kubeconfig
+          secret:
+            secretName: virtual-cluster-operator
+        
 ---
 apiVersion: v1
 kind: Secret
@@ -1007,11 +1033,7 @@ util::wait_for_condition "all pod are ready" \
   300
 echo "all pod ready"
 
-kubectl --kubeconfig $hostConfig_path apply -f ${REPO_ROOT}/deploy/crds/kosmos.io_virtualclusters.yaml
-kubectl --kubeconfig $hostConfig_path apply -f ${REPO_ROOT}/deploy/crds/kosmos.io_globalnodes.yaml
 
-export KUBECONFIG=$hostConfig_path
-bash ${REPO_ROOT}/hack/generate_globalnode.sh
 kind export kubeconfig --name "$HOST_CLUSTER_NAME"
 
 
